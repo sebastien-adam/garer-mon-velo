@@ -48,10 +48,18 @@ function getLatLng(geo_point_2d) {
 
 <template>
   <h1>Où garer mon vélo</h1>
+  <h2>A Strasbourg et environs</h2>
   <!-- <button @click="getData">Touver des arceaux</button> -->
-  <button @click="locateMe" :disabled="isSearching">Me localiser</button>
-  <div v-if="currentPosition">{{ currentPosition }}</div>
-  <div v-else style="color:red">Position actuelle inconnue</div>
+  <div class="flex">
+  <button @click="locateMe" :disabled="isSearching" class="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <g id="feTarget0" fill="none" fill-rule="evenodd" stroke="none" stroke-width="1">
+        <g id="feTarget1" fill="currentColor" fill-rule="nonzero">
+            <path id="feTarget2" d="M19.938 13A8.004 8.004 0 0 1 13 19.938V22h-2v-2.062A8.004 8.004 0 0 1 4.062 13H2v-2h2.062A8.004 8.004 0 0 1 11 4.062V2h2v2.062A8.004 8.004 0 0 1 19.938 11H22v2h-2.062ZM12 18a6 6 0 1 0 0-12a6 6 0 0 0 0 12Zm0-3a3 3 0 1 0 0-6a3 3 0 0 0 0 6Z"/>
+        </g>
+    </g>
+</svg>{{ currentPosition ? "Rafraichir" : "Me localiser" }}</button>
+</div>
+  <div v-if="!currentPosition" style="color: red">Position actuelle inconnue</div>
   <div class="distance">
     <label>Distance: {{area}} m</label>
     <input type="range" v-model="area" min="5" max="800">
@@ -81,14 +89,5 @@ button {
   display: flex;
   justify-content: center;
   flex-direction: column;
-}
-
-.map-container {
-  width: 600px;
-  height: 600px;
-}
-
-.red {
-  background-color: blueviolet;
 }
 </style>
