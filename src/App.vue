@@ -4,7 +4,6 @@ import { ref } from 'vue';
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker, LCircleMarker, LCircle } from "@vue-leaflet/vue-leaflet";
 
-
 // fake in firefox / geo. : data:application/json,{"location": {"lat": 48.58114, "lng": 7.74853}, "accuracy": 2700.0}
 
 const zoom = ref(12);
@@ -47,9 +46,10 @@ function getLatLng(geo_point_2d) {
 </script>
 
 <template>
+  <header>
   <h1>Où garer mon vélo</h1>
   <h2>A Strasbourg et environs</h2>
-  <!-- <button @click="getData">Touver des arceaux</button> -->
+</header>
   <div class="flex">
   <button @click="locateMe" :disabled="isSearching" class="button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
     <g id="feTarget0" fill="none" fill-rule="evenodd" stroke="none" stroke-width="1">
@@ -60,11 +60,11 @@ function getLatLng(geo_point_2d) {
 </svg>{{ currentPosition ? "Rafraichir" : "Me localiser" }}</button>
 </div>
   <div v-if="!currentPosition" style="color: red">Position actuelle inconnue</div>
-  <div class="distance">
+  <div class="flex distance">
     <label>Distance: {{area}} m</label>
     <input type="range" v-model="area" min="5" max="800">
   </div>
-  <div style="height: 600px; width: 100%" >
+  <div class="map" >
     <l-map ref="map" :use-global-leaflet="false" v-model:zoom="zoom" :center="coords">
       <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
         name="OpenStreetMap"></l-tile-layer>
@@ -74,6 +74,11 @@ function getLatLng(geo_point_2d) {
         :lat-lng="getLatLng(arceau.geo_point_2d)" />
     </l-map>
   </div>
+  <footer class="flex">
+    <p>Site réalisé par <a href="https://sebastien-adam.github.io/" target="_blank" rel="noopener noreferrer">Sébastien ADAM</a>
+    </p>
+    <p>Les données : <a href="https://data.strasbourg.eu/pages/accueil/" target="_blank" rel="noopener noreferrer">Open Data Strasbourg</a></p>
+  </footer>
 </template>
 
 <style scoped>
@@ -84,10 +89,37 @@ button {
   margin: 16px;
 }
 
-.distance {
-  margin: 1rem;
+.flex {
+  margin: 0;
   display: flex;
   justify-content: center;
+  align-items: center;
   flex-direction: column;
 }
+
+.distance {
+  margin: 1rem auto;
+  width: 80%;
+}
+
+.map {
+  height: 60vh; 
+  padding: 1rem 1rem;
+}
+
+header {
+  border-bottom: 1px solid gray;
+  margin-bottom: 1rem;
+}
+
+footer {
+  padding-top: 1rem;
+  border-top: 1px solid gray;
+}
+
+p {
+  margin: 0
+}
+
+
 </style>

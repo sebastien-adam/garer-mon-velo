@@ -26,17 +26,17 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  /* min-width: 320px;
-  min-height: 100vh; */
 }
 
 h1 {
   font-size: 2.2em;
   line-height: 1.1;
+  margin: 0;
 }
 
 h2 {
   font-size: 1.3em;
+  margin: 0;
 }
 
 .button {
@@ -98,8 +98,8 @@ h2 {
 
 #app {
   max-width: 1280px;
+  width: 100vw;
   margin: 0 auto;
-  padding: 1rem;
   text-align: center;
 }
 
