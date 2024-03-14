@@ -33,14 +33,22 @@ async function setPosition(pos) {
   const crd = pos.coords;
   currentPosition.value = [crd.latitude, crd.longitude]
   coords.value = [crd.latitude, crd.longitude]
-  zoom.value = 18;
+  getZoom();
   isSearching.value = false;
   await getData()
-  //console.log(arceaux.value);
 }
 
 function getLatLng(geo_point_2d) {
   return [geo_point_2d.lat, geo_point_2d.lon];
+}
+
+function getZoom() {
+  let zoomValue
+  if (area.value <= 100) zoomValue = 18;
+  else if (area.value < 200) zoomValue = 17;
+  else if (area.value < 400) zoomValue = 16;
+  else zoomValue = 15;
+  zoom.value = zoomValue;
 }
 
 </script>
@@ -62,16 +70,16 @@ function getLatLng(geo_point_2d) {
       </svg>{{ currentPosition ? "Rafraichir" : "Me localiser" }}</button>
   </div>
   <div v-if="!currentPosition | !arceaux.length" :class="[isSearching ? 'green' : 'red']">{{ isSearching ? 'Localisation en cours' :
-      !arceaux.length ? "Aucun arceau trouvé" : 'Position actuelle inconnue' }}</div>
+    !arceaux.length ? "Aucun arceau trouvé" : 'Position actuelle inconnue' }}</div>
   <div class="flex distance">
     <label>Distance: {{ area }} m</label>
-    <input type="range" v-model="area" min="5" max="800">
+    <input type="range" v-model="area" min="10" max="800" @change="getZoom">
   </div>
   <div class="map">
     <l-map ref="map" :use-global-leaflet="false" v-model:zoom="zoom" :center="coords">
       <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
         name="OpenStreetMap"></l-tile-layer>
-      <l-circle v-if="currentPosition" :lat-lng="currentPosition" :radius="area" color="green" />
+      <l-circle v-if="currentPosition" :lat-lng="currentPosition" :radius="parseInt(area)" color="green" />
       <l-circle-marker v-if="currentPosition" :lat-lng="currentPosition" :radius=16 color="red" />
       <l-marker v-if="currentPosition" v-for="(arceau, index) in arceaux" :key="index"
         :lat-lng="getLatLng(arceau.geo_point_2d)" />
