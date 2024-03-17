@@ -2,21 +2,21 @@
 
 import { ref } from 'vue';
 import "leaflet/dist/leaflet.css";
-import { LMap, LTileLayer, LMarker, LCircleMarker, LCircle } from "@vue-leaflet/vue-leaflet";
+import {LMap, LTileLayer, LMarker, LCircle, LIcon } from "@vue-leaflet/vue-leaflet";
 
 // fake in firefox / geo. : data:application/json,{"location": {"lat": 48.58114, "lng": 7.74853}, "accuracy": 2700.0}
 
 const zoom = ref(12);
 const arceaux = ref([]);
-const coords = ref([48.58114, 7.74853]);
-const currentPosition = ref(null);
+const currentPosition = ref([48.58114, 7.74853]);
 const area = ref(100);
 const isSearching = ref(false);
+const map=ref();
 
 const API_URL = `https://data.strasbourg.eu/api/explore/v2.1/catalog/datasets/stationnement-velo/records?select=`
 
 async function getData() {
-  const ARCEAU_REQUEST = `geo_point_2d&where=within_distance(geo_point_2d%2C%20geom%27POINT(${currentPosition.value[1]}%20${currentPosition.value[0]})%27%2C%20${area.value}m)%20&limit=40`
+  const ARCEAU_REQUEST = `geo_point_2d&where=within_distance(geo_point_2d%2C%20geom%27POINT(${currentPosition.value[1]}%20${currentPosition.value[0]})%27%2C%20${area.value}m)%20&limit=80`
   const url = `${API_URL}${ARCEAU_REQUEST}`
   //console.log(url);
   const res = await fetch(url);
@@ -32,7 +32,6 @@ async function locateMe() {
 async function setPosition(pos) {
   const crd = pos.coords;
   currentPosition.value = [crd.latitude, crd.longitude]
-  coords.value = [crd.latitude, crd.longitude]
   getZoom();
   isSearching.value = false;
   await getData()
@@ -44,12 +43,14 @@ function getLatLng(geo_point_2d) {
 
 function getZoom() {
   let zoomValue
-  if (area.value <= 100) zoomValue = 18;
-  else if (area.value < 200) zoomValue = 17;
-  else if (area.value < 400) zoomValue = 16;
-  else zoomValue = 15;
+  if (area.value <= 140) zoomValue = 17;
+  else if (area.value < 280) zoomValue = 16;
+  else if (area.value < 540) zoomValue = 15;
+  else zoomValue = 14;
   zoom.value = zoomValue;
 }
+
+
 
 </script>
 
@@ -75,12 +76,22 @@ function getZoom() {
     <label>Distance: {{ area }} m</label>
     <input type="range" v-model="area" min="10" max="800" @change="getZoom">
   </div>
-  <div class="map">
-    <l-map ref="map" :use-global-leaflet="false" v-model:zoom="zoom" :center="coords">
+  <div class="mapLayer">
+    <l-map ref="map" :use-global-leaflet="false" v-model:zoom="zoom" :center="currentPosition" >
       <l-tile-layer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="base"
         name="OpenStreetMap"></l-tile-layer>
       <l-circle v-if="currentPosition" :lat-lng="currentPosition" :radius="parseInt(area)" color="green" />
-      <l-circle-marker v-if="currentPosition" :lat-lng="currentPosition" :radius=16 color="red" />
+      <!-- <l-circle-marker v-if="currentPosition" :lat-lng="currentPosition" :radius=16 color="red" /> -->
+      <l-marker :lat-lng="currentPosition">
+        <l-icon :icon-anchor="[32,32]" :iconSize="[64,64]">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14">
+            <g fill="none" stroke="red" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 11.5a4.5 4.5 0 1 0 0-9a4.5 4.5 0 0 0 0 9"/>
+            <path d="M7 7.5a.5.5 0 1 0 0-1a.5.5 0 0 0 0 1m0-5v-2m0 13v-2M11.5 7h2M.5 7h2"/>
+            </g>
+          </svg>
+        </l-icon>
+      </l-marker>
       <l-marker v-if="currentPosition" v-for="(arceau, index) in arceaux" :key="index"
         :lat-lng="getLatLng(arceau.geo_point_2d)" />
     </l-map>
@@ -115,7 +126,7 @@ button {
   width: 80%;
 }
 
-.map {
+.mapLayer {
   height: 60vh;
   padding: 1rem 1rem;
 }
@@ -151,8 +162,10 @@ p {
 
   color: white;
   background: linear-gradient(90deg, transparent, green, transparent);
-  background-size: 100% 100%;
+  background-size: 200% 100%;
   animation: loading 2s linear infinite;
 
 }
+
+
 </style>

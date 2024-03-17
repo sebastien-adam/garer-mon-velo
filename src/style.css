@@ -107,3 +107,8 @@ h2 {
   display: flex;
   justify-content: center;
 }
+
+.leaflet-div-icon {
+  background: none !important;
+  border: none !important;
+}
